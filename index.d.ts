@@ -141,6 +141,14 @@ declare namespace WAWebJS {
          * @param displayName New display name
          */
         setDisplayName(displayName: string): Promise<boolean>
+
+        /**
+         * Sets group's or current user's picture.
+         * @param {string} chatId
+         * @param {MessageMedia} picture
+         * @return {Promise<string>}
+         */
+        setPicture(chatId: string, picture: MessageMedia): Promise<string>
                 
         /** Changes and returns the archive state of the Chat */
         unarchiveChat(chatId: string): Promise<boolean>
@@ -1145,6 +1153,12 @@ declare namespace WAWebJS {
         setSubject: (subject: string) => Promise<boolean>;
         /** Updates the group description */
         setDescription: (description: string) => Promise<boolean>;
+        /**
+         * Sets the group's picture.
+         * @param {MessageMedia} picture
+         * @return {Promise<string>}
+         */
+        setPicture(picture: MessageMedia): Promise<string>
         /** Updates the group settings to only allow admins to send messages 
          * @param {boolean} [adminsOnly=true] Enable or disable this option 
          * @returns {Promise<boolean>} Returns true if the setting was properly updated. This can return false if the user does not have the necessary permissions.
