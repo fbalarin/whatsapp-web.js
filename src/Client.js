@@ -848,7 +848,7 @@ class Client extends EventEmitter {
             const thumbnail = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 96 });
             const profilePic = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 640 });
             const wid = window.Store.WidFactory.createWid(chatId);
-            return await window.Store.ProfilePic.SendSetPicture(wid, thumbnail, profilePic);
+            return await window.Store.ProfilePic.sendSetPicture(wid, thumbnail, profilePic);
         }, chatId, picture );
         return res.eurl;
     }
