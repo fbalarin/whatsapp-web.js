@@ -823,19 +823,15 @@ class Client extends EventEmitter {
      */
     async setDisplayName(displayName) {
         const couldSet = await this.pupPage.evaluate(async displayName => {
-            // if(!window.Store.Conn.canSetMyPushname()) return false;
+            if(!window.Store.Conn.canSetMyPushname()) return false;
 
-            // if(window.Store.MDBackend) {
-            //     // TODO
-            //     return false;
-            // } else {
-                try{
-                    const res = await window.Store.Wap.setPushname(displayName);
-                    return !res.status || res.status === 200;
-                } catch(e) {
-                    return false;
-                }
-            // }
+            if(window.Store.MDBackend) {
+                // TODO
+                return false;
+            } else {
+                const res = await window.Store.Wap.setPushname(displayName);
+                return !res.status || res.status === 200;
+            }
         }, displayName);
 
         return couldSet;
