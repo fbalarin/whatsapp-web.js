@@ -627,47 +627,43 @@ exports.LoadUtils = () => {
         ]);
         await window.Store.Socket.deprecatedCastStanza(stanza);
     };
-    /**
-     * Cropped image to profile's picture size
-     * @param {Buffer} buffer
-     * @return {Promise<{preview: Promise<string>, img: Promise<string>}>}
-     */
-    window.WWebJS.generateProfilePicture = (buffer) => {
-        /**
-         * @param {HTMLCanvasElement} canvas
-         * @param {number} maxSize
-         * @return {HTMLCanvasElement}
-         */
-        const resizeByMax = (canvas, maxSize) => {
-          const ctx = canvas.getContext('2d');
-          const {width, height} = canvas;
-          const outputRatio = maxSize / Math.max(height, width);
-          const resizedCanvas = document.createElement('canvas');
-          resizedCanvas.width = Math.floor(width * outputRatio);
-          resizedCanvas.height = Math.floor(height * outputRatio);
-          const resizedCtx = resizedCanvas.getContext('2d');
-          resizedCtx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
-          return resizedCanvas;
-        };
-      
-        /**
-         * @param {HTMLCanvasElement} canvas
-         * @return {string}
-         */
-        const canvasToBase64 = (canvas) => {
-          return canvas.toDataURL('image/jpeg').split(',')[1];
-        };
-      
-        const img = new Image();
-        img.src = URL.createObjectURL(new Blob([buffer]));
+
+    window.WWebJS.cropAndResizeImage = async (media, options = {}) => {
+        if (!media.mimetype.includes('image'))
+            throw new Error('Media is not an image');
+
+        if (options.mimetype && !options.mimetype.includes('image'))
+            delete options.mimetype;
+
+        options = Object.assign({ size: 640, mimetype: media.mimetype, quality: .75, asDataUrl: false }, options);
+
+        const img = await new Promise ((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = `data:${media.mimetype};base64,${media.data}`;
+        });
+
+        const sl = Math.min(img.width, img.height);
+        const sx = Math.floor((img.width - sl) / 2);
+        const sy = Math.floor((img.height - sl) / 2);
+
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = options.size;
+        canvas.height = options.size;
+
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        return {
-          img: canvasToBase64(resizeByMax(canvas, 640)),
-          preview: canvasToBase64(resizeByMax(canvas, 96)),
-        };
+        ctx.drawImage(img, sx, sy, sl, sl, 0, 0, options.size, options.size);
+
+        const dataUrl = canvas.toDataURL(options.mimetype, options.quality);
+
+        if (options.asDataUrl)
+            return dataUrl;
+
+        return Object.assign(media, {
+            mimetype: options.mimeType,
+            data: dataUrl.replace(`data:${options.mimeType};base64,`, '')
+        });
     };
+    
 };
