@@ -844,13 +844,12 @@ class Client extends EventEmitter {
      * @return {Promise<string>}
      */
     async setPicture(chatId, picture){
-        const buffer = Buffer.from(picture.data, 'base64');
-        
-        const res = await this.pupPage.evaluate(async (chatId, buffer) => {
-            const cropped = await window.WWebJS.generateProfilePicture(buffer);
+        const res = await this.pupPage.evaluate(async (chatId, picture) => {
+            const thumbnail = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 96 });
+            const profilePic = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 640 });
             const wid = window.Store.WidFactory.createWid(chatId);
-            return await window.Store.SendSetPicture(wid, cropped.preview, cropped.img);
-        }, chatId, buffer );
+            return await window.Store.SendSetPicture(wid, thumbnail, profilePic);
+        }, chatId, picture );
         return res.eurl;
     }
     
