@@ -181,50 +181,6 @@ class Util {
     static setFfmpegPath(path) {
         ffmpeg.setFfmpegPath(path);
     }
-
-    /**
-     * Cropped image to profile's picture size
-     * @param {Buffer} buffer
-     * @return {Promise<{preview: Promise<string>, img: Promise<string>}>}
-     */
-    static async generateProfilePicture(buffer) {
-        /**
-         * @param {HTMLCanvasElement} canvas
-         * @param {number} maxSize
-         * @return {HTMLCanvasElement}
-         */
-        const resizeByMax = (canvas, maxSize) => {
-          const ctx = canvas.getContext('2d');
-          const {width, height} = canvas;
-          const outputRatio = maxSize / Math.max(height, width);
-          const resizedCanvas = document.createElement('canvas');
-          resizedCanvas.width = Math.floor(width * outputRatio);
-          resizedCanvas.height = Math.floor(height * outputRatio);
-          const resizedCtx = resizedCanvas.getContext('2d');
-          resizedCtx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
-          return resizedCanvas;
-        };
-      
-        /**
-         * @param {HTMLCanvasElement} canvas
-         * @return {string}
-         */
-        const canvasToBase64 = (canvas) => {
-          return canvas.toDataURL('image/jpeg').split(',')[1];
-        };
-      
-        const img = new Image();
-        img.src = URL.createObjectURL(new Blob([buffer]));
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        return {
-          img: canvasToBase64(resizeByMax(canvas, 640)),
-          preview: canvasToBase64(resizeByMax(canvas, 96)),
-        };
-    }
 }
 
 module.exports = Util;
