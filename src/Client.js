@@ -840,11 +840,11 @@ class Client extends EventEmitter {
     /**
      * Sets group's or current user's picture.
      * @param {string} chatId
-     * @param {MessageMedia} picture
+     * @param {MessageMedia} media
      * @return {Promise<string>}
      */
     async setPicture(chatId, picture){
-        const res = await this.pupPage.evaluate(async (chatId, picture) => {
+        const res = await this.pupPage.evaluate(async (chatId, media) => {
             const thumbnail = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 96 });
             const profilePic = await window.WWebJS.cropAndResizeImage(media, { asDataUrl: true, mimetype: 'image/jpeg', size: 640 });
             const wid = window.Store.WidFactory.createWid(chatId);
